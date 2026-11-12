@@ -1,6 +1,6 @@
 # oxc-config
 
-Shared [Oxlint](https://oxc.rs/docs/guide/usage/linter) and [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) configs. The formatter output matches the Biome setup used so far, so switching a project causes almost no formatting diff.
+Shared [Oxlint](https://oxc.rs/docs/guide/usage/linter) and [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) configs.
 
 ## Use in a project
 
@@ -62,7 +62,7 @@ Project rules go into the project's `oxlint.config.ts` after `extends`, for exam
 
 ## Formatting
 
-`oxfmt.js` reproduces the Biome settings used across existing projects: 2 spaces, width 80, single quotes, no semicolons, double quotes in CSS, Biome's import order. It leaves `package.json` key order, embedded CSS-in-JS, Markdown and YAML untouched because Biome did.
+`oxfmt.js` sets 2 spaces, width 80, single quotes and no semicolons, with double quotes in CSS. Imports are sorted: Node built-ins, packages, aliases, then relative paths. `package.json` key order, embedded CSS-in-JS, Markdown and YAML are left untouched.
 
 To change a setting in one project, override it after the spread. To add ignores, keep the shared ones:
 
@@ -73,16 +73,9 @@ export default defineConfig({
 })
 ```
 
-### Known differences from Biome
-
-- Imports are sorted across a side-effect import such as `import './app.css'`; Biome sorts each side separately.
-- Relative imports that differ only in letter case sort differently.
-- A long `interface A extends B<...>` header wraps inside the type arguments.
-- Long comma-separated CSS values such as `unicode-range` wrap at width 80.
-
 ### Tailwind class sorting
 
-Off by default, because Oxfmt uses the official Tailwind order and Biome's `useSortedClasses` does not, so turning it on reorders most class strings once. Enable it per project:
+Off by default, because the stylesheet path differs per project. Enable it per project:
 
 ```ts
 export default defineConfig({
@@ -110,6 +103,11 @@ export default defineConfig({
 
    `correctness/useUniqueElementIds` and `nursery/noTailwindRawColors` have no mapping here yet.
 
-3. Run `npx oxfmt` and review the diff. Expect a handful of files at most.
+3. Run `npx oxfmt` and review the diff. Expect a handful of files at most, from these differences:
+   - Imports are sorted across a side-effect import such as `import './app.css'`; Biome sorts each side separately.
+   - Relative imports that differ only in letter case sort differently.
+   - A long `interface A extends B<...>` header wraps inside the type arguments.
+   - Long comma-separated CSS values such as `unicode-range` wrap at width 80.
+   - Tailwind class sorting, once enabled, uses the official Tailwind order and reorders most class strings once.
 4. Run `npx oxlint` and fix or triage the findings.
 5. Remove `@biomejs/biome` and `biome.json`.
