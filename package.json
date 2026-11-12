@@ -1,7 +1,7 @@
 {
-  "name": "@alainkaiser/oxc-config",
+  "name": "@alainkaiser/static-analysis",
   "version": "0.1.0",
-  "description": "Shared Oxlint and Oxfmt configs",
+  "description": "Shared static analysis setup: Oxlint and Oxfmt configs",
   "private": true,
   "type": "module",
   "exports": {

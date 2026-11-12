@@ -1,13 +1,13 @@
-# oxc-config
+# static-analysis
 
-Shared [Oxlint](https://oxc.rs/docs/guide/usage/linter) and [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) configs.
+Shared static analysis setup for projects: the automatic checks a project installs as a dev dependency. It ships [Oxlint](https://oxc.rs/docs/guide/usage/linter) and [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) configs.
 
 ## Use in a project
 
 1. Install the tools and this package:
 
    ```bash
-   npm i -D oxlint oxfmt oxlint-tsgolint github:alainkaiser/oxc-config
+   npm i -D oxlint oxfmt oxlint-tsgolint github:alainkaiser/static-analysis
    ```
 
    While this repository is private, the install works only where Git has access to it.
@@ -15,7 +15,7 @@ Shared [Oxlint](https://oxc.rs/docs/guide/usage/linter) and [Oxfmt](https://oxc.
 2. Create `oxlint.config.ts`:
 
    ```ts
-   import { base, react, typeAware } from '@alainkaiser/oxc-config/oxlint'
+   import { base, react, typeAware } from '@alainkaiser/static-analysis/oxlint'
    import { defineConfig } from 'oxlint'
 
    export default defineConfig({
@@ -29,7 +29,7 @@ Shared [Oxlint](https://oxc.rs/docs/guide/usage/linter) and [Oxfmt](https://oxc.
 3. Create `oxfmt.config.ts`:
 
    ```ts
-   import base from '@alainkaiser/oxc-config/oxfmt'
+   import base from '@alainkaiser/static-analysis/oxfmt'
    import { defineConfig } from 'oxfmt'
 
    export default defineConfig({
