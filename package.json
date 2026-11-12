@@ -1,0 +1,46 @@
+{
+  "name": "@alainkaiser/oxc-config",
+  "version": "0.1.0",
+  "description": "Shared Oxlint and Oxfmt configs",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./oxfmt": {
+      "types": "./oxfmt.d.ts",
+      "default": "./oxfmt.js"
+    },
+    "./oxlint": {
+      "types": "./oxlint.d.ts",
+      "default": "./oxlint.js"
+    }
+  },
+  "files": [
+    "oxfmt.js",
+    "oxfmt.d.ts",
+    "oxlint.js",
+    "oxlint.d.ts"
+  ],
+  "scripts": {
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "check": "oxlint && oxfmt --check"
+  },
+  "peerDependencies": {
+    "oxfmt": ">=0.76.0",
+    "oxlint": ">=1.91.0",
+    "oxlint-tsgolint": ">=7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "oxlint-tsgolint": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.76.0",
+    "oxlint": "^1.91.0",
+    "oxlint-tsgolint": "^7.0.2005"
+  }
+}
