@@ -1,10 +1,6 @@
 /** @typedef {import('oxlint').OxlintConfig} OxlintConfig */
 
-/**
- * JavaScript and TypeScript rules for every project.
- *
- * @type {OxlintConfig}
- */
+/** @type {OxlintConfig} */
 export const base = {
   plugins: ['eslint', 'typescript', 'unicorn', 'oxc', 'import', 'promise'],
   categories: {
@@ -24,19 +20,13 @@ export const base = {
     'unicorn/no-abusive-eslint-disable': 'error',
     'unicorn/prefer-node-protocol': 'error',
 
-    // Side-effect imports are how CSS and fonts get loaded.
     'import/no-unassigned-import': 'off',
     // Sanity documents use `_id`, `_type` and `_key`.
     'no-underscore-dangle': 'off',
   },
 }
 
-/**
- * React rules: the `recommended` preset of eslint-plugin-react-hooks from
- * react.dev, plus JSX correctness and accessibility.
- *
- * @type {OxlintConfig}
- */
+/** @type {OxlintConfig} */
 export const react = {
   plugins: [...(base.plugins ?? []), 'react', 'jsx-a11y'],
   rules: {
@@ -66,16 +56,11 @@ export const react = {
     'react/hooks': 'off',
     'react/exhaustive-effect-dependencies': 'off',
     'react/memo-dependencies': 'off',
-    // The automatic JSX runtime needs no React import.
     'react/react-in-jsx-scope': 'off',
   },
 }
 
-/**
- * Rules that need type information. Requires `oxlint-tsgolint`.
- *
- * @type {OxlintConfig}
- */
+/** @type {OxlintConfig} */
 export const typeAware = {
   options: {
     typeAware: true,
