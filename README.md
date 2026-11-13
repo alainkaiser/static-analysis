@@ -58,6 +58,8 @@ Shared static analysis setup for projects: the automatic checks a project instal
 
    With `typeAware`, `oxlint` also reports TypeScript compiler errors in the files it lints. It skips files that `.gitignore` or `ignorePatterns` exclude, even when `tsconfig.json` includes them. If `tsconfig.json` includes such files, for example a git-ignored `generated/` folder, keep `tsc --noEmit` in the `lint` script. Otherwise the project needs no separate `tsc` step. In React Router projects, run `react-router typegen` before `oxlint`. Without the generated types, each `./+types/*` import fails with TS2307.
 
+   `oxfmt` sorts imports across a side-effect import such as `import './setup'`. After `fix`, the imported modules can load in a different order. If a module must run before the imports that follow it, put a blank line before and after its import. `oxfmt` does not sort imports across a blank line.
+
 ## Lint presets
 
 Every rule reports as an error. A check that passes or fails is something CI and coding agents act on; warnings get ignored.
@@ -167,4 +169,4 @@ export default defineConfig({
 
 ## Change this package
 
-`npm test` lints the files in `test/fixtures` with all three presets. For each file, it compares the reported rule IDs with the table in `test/presets.test.js`, and it checks three formatting cases. When you change a preset or upgrade Oxlint, add or update a fixture and its expected IDs, then run `npm run check`.
+`npm test` lints the files in `test/fixtures` with all three presets. For each file, it compares the reported rule IDs with the table in `test/presets.test.js`, and it checks four formatting cases. When you change a preset or upgrade Oxlint, add or update a fixture and its expected IDs, then run `npm run check`.
