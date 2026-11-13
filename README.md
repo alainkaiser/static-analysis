@@ -66,9 +66,11 @@ Every rule reports as an error. A check that passes or fails is something CI and
 
 | Preset      | Use for                         | Contains                                                                                                                                                                                 |
 | ----------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `base`      | Every project                   | Oxlint's `correctness` and `suspicious` categories, no `any`, no non-null assertions, no blanket lint or TypeScript suppressions, no empty blocks such as `catch {}`, no import cycles, kebab-case file names, no focused, skipped or assertion-free Vitest tests |
+| `base`      | Every project                   | Oxlint's `correctness` and `suspicious` categories, no `any`, no non-null assertions, no blanket lint or TypeScript suppressions, no empty blocks such as `catch {}`, no import cycles, kebab-case file names, no `.only`, `.skip` or assertion-free Vitest tests |
 | `react`     | React projects                  | The `recommended` preset of `eslint-plugin-react-hooks` from [react.dev](https://react.dev/reference/eslint-plugin-react-hooks), including the React Compiler rules, plus [effect rules](#react-effect-rules), JSX and `jsx-a11y` checks |
 | `typeAware` | TypeScript 7 projects that extend the shared `tsconfig` | TypeScript compiler errors and the type-checked rules of typescript-eslint: floating and misused promises, the `no-unsafe-*` family, plus unnecessary conditions, deprecated APIs, exhaustive switches and a missing `await` on a promise returned inside `try` |
+
+`base` does not check the conditions of `skipIf` and `runIf`. A test with `it.skipIf(true)` passes lint, and Vitest reports it as skipped.
 
 `typeAware` turns on type-aware linting and type checking by itself. It needs `oxlint-tsgolint` and TypeScript 7. Leave it out of `extends` in projects that cannot use it.
 
