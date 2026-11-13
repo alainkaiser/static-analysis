@@ -56,7 +56,7 @@ Shared static analysis setup for projects: the automatic checks a project instal
    }
    ```
 
-   With `typeAware`, `oxlint` also reports TypeScript compiler errors, so the project needs no separate `tsc` step. In React Router projects, run `react-router typegen` before `oxlint`. Without the generated types, each `./+types/*` import fails with TS2307.
+   With `typeAware`, `oxlint` also reports TypeScript compiler errors in the files it lints. It skips files that `.gitignore` or `ignorePatterns` exclude, even when `tsconfig.json` includes them. If `tsconfig.json` includes such files, for example a git-ignored `generated/` folder, keep `tsc --noEmit` in the `lint` script. Otherwise the project needs no separate `tsc` step. In React Router projects, run `react-router typegen` before `oxlint`. Without the generated types, each `./+types/*` import fails with TS2307.
 
 ## Lint presets
 
