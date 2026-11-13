@@ -2,13 +2,22 @@
 
 /** @type {OxlintConfig} */
 export const base = {
-  plugins: ['eslint', 'typescript', 'unicorn', 'oxc', 'import', 'promise'],
+  plugins: [
+    'eslint',
+    'typescript',
+    'unicorn',
+    'oxc',
+    'import',
+    'promise',
+    'vitest',
+  ],
   categories: {
     correctness: 'error',
     suspicious: 'error',
   },
   rules: {
     eqeqeq: ['error', 'always', { null: 'ignore' }],
+    'no-empty': 'error',
     'no-var': 'error',
     'prefer-const': 'error',
     'import/no-cycle': 'error',
@@ -64,6 +73,7 @@ export const react = {
 export const typeAware = {
   options: {
     typeAware: true,
+    typeCheck: true,
   },
   rules: {
     'typescript/await-thenable': 'error',
@@ -76,7 +86,10 @@ export const typeAware = {
     'typescript/no-implied-eval': 'error',
     'typescript/no-misused-promises': 'error',
     'typescript/no-redundant-type-constituents': 'error',
-    'typescript/no-unnecessary-condition': 'error',
+    'typescript/no-unnecessary-condition': [
+      'error',
+      { allowConstantLoopConditions: 'only-allowed-literals' },
+    ],
     'typescript/no-unnecessary-type-assertion': 'error',
     'typescript/no-unsafe-argument': 'error',
     'typescript/no-unsafe-assignment': 'error',
@@ -90,6 +103,7 @@ export const typeAware = {
     'typescript/require-await': 'error',
     'typescript/restrict-plus-operands': 'error',
     'typescript/restrict-template-expressions': 'error',
+    'typescript/return-await': ['error', 'error-handling-correctness-only'],
     'typescript/switch-exhaustiveness-check': 'error',
     'typescript/unbound-method': 'error',
   },

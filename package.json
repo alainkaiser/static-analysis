@@ -12,18 +12,21 @@
     "./oxlint": {
       "types": "./oxlint.d.ts",
       "default": "./oxlint.js"
-    }
+    },
+    "./tsconfig": "./tsconfig.json"
   },
   "files": [
     "oxfmt.js",
     "oxfmt.d.ts",
     "oxlint.js",
-    "oxlint.d.ts"
+    "oxlint.d.ts",
+    "tsconfig.json"
   ],
   "scripts": {
     "lint": "oxlint",
     "format": "oxfmt",
-    "check": "oxlint && oxfmt --check"
+    "test": "node --test test/presets.test.js",
+    "check": "oxlint && oxfmt --check && npm test"
   },
   "peerDependencies": {
     "oxfmt": ">=0.76.0",
