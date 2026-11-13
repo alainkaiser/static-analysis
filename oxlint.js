@@ -122,5 +122,10 @@ export const typeAware = {
     'typescript/return-await': ['error', 'error-handling-correctness-only'],
     'typescript/switch-exhaustiveness-check': 'error',
     'typescript/unbound-method': 'error',
+
+    // The type check already reports a missing return value where the result
+    // is used. This rule also reports effects that return early and return a
+    // cleanup later.
+    'typescript/consistent-return': 'off',
   },
 }

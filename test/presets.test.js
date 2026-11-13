@@ -52,6 +52,7 @@ const expected = {
   'react/effects/notify-parent-state.tsx': ['react-effects(no-notify-parent)'],
   'react/effects/ok-chat-connection.tsx': [],
   'react/effects/ok-derived-condition.tsx': [],
+  'react/effects/ok-early-return-cleanup.tsx': [],
   'react/effects/ok-document-title.tsx': [],
   'react/effects/ok-fetch-with-cleanup.tsx': [],
   'react/effects/ok-gated-sync-without-data.tsx': [],
