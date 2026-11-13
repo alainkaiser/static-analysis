@@ -2,13 +2,22 @@
 
 /** @type {OxlintConfig} */
 export const base = {
-  plugins: ['eslint', 'typescript', 'unicorn', 'oxc', 'import', 'promise'],
+  plugins: [
+    'eslint',
+    'typescript',
+    'unicorn',
+    'oxc',
+    'import',
+    'promise',
+    'vitest',
+  ],
   categories: {
     correctness: 'error',
     suspicious: 'error',
   },
   rules: {
     eqeqeq: ['error', 'always', { null: 'ignore' }],
+    'no-empty': 'error',
     'no-var': 'error',
     'prefer-const': 'error',
     'import/no-cycle': 'error',
