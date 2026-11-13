@@ -194,6 +194,38 @@ test('format keeps side-effect imports in place', () => {
   assert.equal(format('entry.ts', input), input)
 })
 
+test('format sorts across a side-effect import unless blank lines separate it', () => {
+  const input = [
+    "import { value } from './z-value'",
+    "import './initialize'",
+    "import { read } from './a-read'",
+    '',
+    'export const all = [value, read]',
+    '',
+  ].join('\n')
+  const output = [
+    "import { read } from './a-read'",
+    "import './initialize'",
+    "import { value } from './z-value'",
+    '',
+    'export const all = [value, read]',
+    '',
+  ].join('\n')
+  assert.equal(format('entry.ts', input), output)
+
+  const separated = [
+    "import { value } from './z-value'",
+    '',
+    "import './initialize'",
+    '',
+    "import { read } from './a-read'",
+    '',
+    'export const all = [value, read]',
+    '',
+  ].join('\n')
+  assert.equal(format('entry.ts', separated), separated)
+})
+
 test('format uses double quotes in CSS', () => {
   assert.equal(
     format('styles.css', "a {\n  font-family: 'Geist';\n}\n"),
