@@ -123,12 +123,15 @@ const lint = spawnSync(
   },
 )
 assert.ok(lint.stdout.startsWith('{'), lint.stdout)
-const reported = new Map()
-for (const diagnostic of JSON.parse(lint.stdout).diagnostics) {
-  const codes = reported.get(diagnostic.filename) ?? []
-  codes.push(diagnostic.code ?? diagnostic.message)
-  reported.set(diagnostic.filename, codes)
-}
+const reported = Map.groupBy(
+  JSON.parse(lint.stdout).diagnostics,
+  (diagnostic) => diagnostic.filename,
+)
+const id = (diagnostic) => diagnostic.code ?? diagnostic.message
+
+test('lint exits with status 1 on the failing fixtures', () => {
+  assert.equal(lint.status, 1)
+})
 
 test('every lint fixture has an expectation', () => {
   const sources = readdirSync(fixtures, { recursive: true })
@@ -144,7 +147,14 @@ test('every lint fixture has an expectation', () => {
 
 for (const [file, codes] of Object.entries(expected)) {
   test(`lint ${file}`, () => {
-    assert.deepEqual((reported.get(file) ?? []).toSorted(), codes.toSorted())
+    const diagnostics = reported.get(file) ?? []
+    assert.deepEqual(diagnostics.map(id).toSorted(), codes.toSorted())
+    assert.deepEqual(
+      diagnostics
+        .filter((diagnostic) => diagnostic.severity !== 'error')
+        .map(id),
+      [],
+    )
   })
 }
 
