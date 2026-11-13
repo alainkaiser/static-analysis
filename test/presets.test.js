@@ -28,6 +28,7 @@ const expected = {
   'base/routes/_index.tsx': [],
   'base/routes/blog.$slug.tsx': [],
   'base/shape.ts': [],
+  'base/then-without-return.ts': ['promise(always-return)'],
   'base/ts-ignore.ts': ['typescript(ban-ts-comment)'],
   'base/unused-disable.ts': [unusedDirective],
   'base/value-import-for-type.ts': [

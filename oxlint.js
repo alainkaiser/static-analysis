@@ -17,6 +17,7 @@ export const base = {
   },
   rules: {
     eqeqeq: ['error', 'always', { null: 'ignore' }],
+    'promise/always-return': ['error', { ignoreLastCallback: true }],
     'no-empty': 'error',
     'no-var': 'error',
     'prefer-const': 'error',
