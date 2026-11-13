@@ -5,6 +5,10 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./doctor": {
+      "types": "./doctor.d.ts",
+      "default": "./doctor.js"
+    },
     "./oxfmt": {
       "types": "./oxfmt.d.ts",
       "default": "./oxfmt.js"
@@ -16,6 +20,8 @@
     "./tsconfig": "./tsconfig.json"
   },
   "files": [
+    "doctor.js",
+    "doctor.d.ts",
     "oxfmt.js",
     "oxfmt.d.ts",
     "oxlint.js",
