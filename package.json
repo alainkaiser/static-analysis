@@ -20,7 +20,8 @@
     "oxfmt.d.ts",
     "oxlint.js",
     "oxlint.d.ts",
-    "tsconfig.json"
+    "tsconfig.json",
+    "plugins/react-effects.js"
   ],
   "scripts": {
     "lint": "oxlint",

@@ -65,12 +65,27 @@ Every rule reports as an error. A check that passes or fails is something CI and
 | Preset      | Use for                         | Contains                                                                                                                                                                                 |
 | ----------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `base`      | Every project                   | Oxlint's `correctness` and `suspicious` categories, no `any`, no non-null assertions, no blanket lint or TypeScript suppressions, no empty blocks such as `catch {}`, no import cycles, kebab-case file names, no focused, skipped or assertion-free Vitest tests |
-| `react`     | React projects                  | The `recommended` preset of `eslint-plugin-react-hooks` from [react.dev](https://react.dev/reference/eslint-plugin-react-hooks), including the React Compiler rules, plus JSX and `jsx-a11y` checks |
+| `react`     | React projects                  | The `recommended` preset of `eslint-plugin-react-hooks` from [react.dev](https://react.dev/reference/eslint-plugin-react-hooks), including the React Compiler rules, plus [effect rules](#react-effect-rules), JSX and `jsx-a11y` checks |
 | `typeAware` | TypeScript 7 projects that extend the shared `tsconfig` | TypeScript compiler errors and the type-checked rules of typescript-eslint: floating and misused promises, the `no-unsafe-*` family, plus unnecessary conditions, deprecated APIs, exhaustive switches and a missing `await` on a promise returned inside `try` |
 
 `typeAware` turns on type-aware linting and type checking by itself. It needs `oxlint-tsgolint` and TypeScript 7. Leave it out of `extends` in projects that cannot use it.
 
 Project rules go into the project's `oxlint.config.ts` after `extends`, for example `no-restricted-imports` with a message that names the replacement.
+
+## React effect rules
+
+The `react` preset loads `plugins/react-effects.js`, an Oxlint JS plugin in this package. Its rules cover the patterns from [You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect) that React's own rules miss. Each message names the fix and links the matching react.dev section.
+
+| Rule | Reports an effect that |
+| --- | --- |
+| `react-effects/no-event-handler` | calls a function with a state or prop value inside an `if` on that value, such as `if (submitted) post(url, submitted)` |
+| `react-effects/no-notify-parent` | passes state, or data from a custom hook, to a callback prop |
+| `react-effects/no-external-store` | copies a value into state right away and again on each `addEventListener` or `subscribe` event, which `useSyncExternalStore` does instead |
+| `react-effects/no-fetch-without-cleanup` | has dependencies, sets state after a `.then` or inside an `async` function, and returns no cleanup |
+
+`react/set-state-in-effect` already reports derived state, state that is reset or adjusted when a prop changes, and chains of effects. Effects that run once at app start stay unreported, because whether that code belongs in an effect depends on intent.
+
+The rules skip calls on refs such as `ref.current?.showModal()`, calls that do not receive the tested value, and calls inside listeners and observers. Oxlint marks JS plugins as alpha, so an Oxlint upgrade can break the plugin. `npm test` catches that.
 
 ## TypeScript settings
 

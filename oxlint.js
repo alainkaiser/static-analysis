@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url'
+
 /** @typedef {import('oxlint').OxlintConfig} OxlintConfig */
 
 /** @type {OxlintConfig} */
@@ -39,6 +41,14 @@ export const base = {
 /** @type {OxlintConfig} */
 export const react = {
   plugins: [...(base.plugins ?? []), 'react', 'jsx-a11y'],
+  jsPlugins: [
+    {
+      name: 'react-effects',
+      specifier: fileURLToPath(
+        new URL('./plugins/react-effects.js', import.meta.url),
+      ),
+    },
+  ],
   rules: {
     'react/rules-of-hooks': 'error',
     'react/exhaustive-deps': 'error',
@@ -61,6 +71,11 @@ export const react = {
     'react/no-danger': 'error',
     'react/no-unstable-nested-components': 'error',
     'react/self-closing-comp': 'error',
+
+    'react-effects/no-event-handler': 'error',
+    'react-effects/no-external-store': 'error',
+    'react-effects/no-fetch-without-cleanup': 'error',
+    'react-effects/no-notify-parent': 'error',
 
     // These report the same problems as rules-of-hooks and exhaustive-deps.
     'react/hooks': 'off',
