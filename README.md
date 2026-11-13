@@ -12,6 +12,8 @@ Shared static analysis setup for projects: the automatic checks a project instal
 
    While this repository is private, the install works only where Git has access to it.
 
+   Oxlint does not skip `node_modules` on its own. Check that the project's `.gitignore` lists `node_modules`. Without that entry, `oxlint` also lints the installed packages.
+
 2. Extend the shared TypeScript settings in `tsconfig.json`:
 
    ```json
@@ -56,7 +58,9 @@ Shared static analysis setup for projects: the automatic checks a project instal
    }
    ```
 
-   With `typeAware`, `oxlint` also reports TypeScript compiler errors, so the project needs no separate `tsc` step. In React Router projects, run `react-router typegen` before `oxlint`. Without the generated types, each `./+types/*` import fails with TS2307.
+   With `typeAware`, `oxlint` also reports TypeScript compiler errors in the files it lints. It skips files that `.gitignore` or `ignorePatterns` exclude, even when `tsconfig.json` includes them. If `tsconfig.json` includes such files, for example a git-ignored `generated/` folder, keep `tsc --noEmit` in the `lint` script. Otherwise the project needs no separate `tsc` step. In React Router projects, run `react-router typegen` before `oxlint`. Without the generated types, each `./+types/*` import fails with TS2307.
+
+   `oxfmt` sorts imports across a side-effect import such as `import './setup'`. After `fix`, the imported modules can load in a different order. If a module must run before the imports that follow it, put a blank line before and after its import. `oxfmt` does not sort imports across a blank line.
 
 ## Lint presets
 
@@ -64,9 +68,11 @@ Every rule reports as an error. A check that passes or fails is something CI and
 
 | Preset      | Use for                         | Contains                                                                                                                                                                                 |
 | ----------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `base`      | Every project                   | Oxlint's `correctness` and `suspicious` categories, no `any`, no non-null assertions, no blanket lint or TypeScript suppressions, no empty blocks such as `catch {}`, no import cycles, kebab-case file names, no focused, skipped or assertion-free Vitest tests |
+| `base`      | Every project                   | Oxlint's `correctness` and `suspicious` categories, no `any`, no non-null assertions, no blanket lint or TypeScript suppressions, no empty blocks such as `catch {}`, no import cycles, kebab-case file names, no `.only`, `.skip` or assertion-free Vitest tests |
 | `react`     | React projects                  | The `recommended` preset of `eslint-plugin-react-hooks` from [react.dev](https://react.dev/reference/eslint-plugin-react-hooks), including the React Compiler rules, plus [effect rules](#react-effect-rules), JSX and `jsx-a11y` checks |
 | `typeAware` | TypeScript 7 projects that extend the shared `tsconfig` | TypeScript compiler errors and the type-checked rules of typescript-eslint: floating and misused promises, the `no-unsafe-*` family, plus unnecessary conditions, deprecated APIs, exhaustive switches and a missing `await` on a promise returned inside `try` |
+
+`base` does not check the conditions of `skipIf` and `runIf`. A test with `it.skipIf(true)` passes lint, and Vitest reports it as skipped.
 
 `typeAware` turns on type-aware linting and type checking by itself. It needs `oxlint-tsgolint` and TypeScript 7. Leave it out of `extends` in projects that cannot use it.
 
@@ -167,4 +173,4 @@ export default defineConfig({
 
 ## Change this package
 
-`npm test` lints the files in `test/fixtures` with all three presets. For each file, it compares the reported rule IDs with the table in `test/presets.test.js`, and it checks three formatting cases. When you change a preset or upgrade Oxlint, add or update a fixture and its expected IDs, then run `npm run check`.
+`npm test` lints the files in `test/fixtures` with all three presets. For each file, it compares the reported rule IDs with the table in `test/presets.test.js`, and it checks four formatting cases. When you change a preset or upgrade Oxlint, add or update a fixture and its expected IDs, then run `npm run check`.

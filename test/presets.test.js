@@ -123,12 +123,15 @@ const lint = spawnSync(
   },
 )
 assert.ok(lint.stdout.startsWith('{'), lint.stdout)
-const reported = new Map()
-for (const diagnostic of JSON.parse(lint.stdout).diagnostics) {
-  const codes = reported.get(diagnostic.filename) ?? []
-  codes.push(diagnostic.code ?? diagnostic.message)
-  reported.set(diagnostic.filename, codes)
-}
+const reported = Map.groupBy(
+  JSON.parse(lint.stdout).diagnostics,
+  (diagnostic) => diagnostic.filename,
+)
+const id = (diagnostic) => diagnostic.code ?? diagnostic.message
+
+test('lint exits with status 1 on the failing fixtures', () => {
+  assert.equal(lint.status, 1)
+})
 
 test('every lint fixture has an expectation', () => {
   const sources = readdirSync(fixtures, { recursive: true })
@@ -144,7 +147,14 @@ test('every lint fixture has an expectation', () => {
 
 for (const [file, codes] of Object.entries(expected)) {
   test(`lint ${file}`, () => {
-    assert.deepEqual((reported.get(file) ?? []).toSorted(), codes.toSorted())
+    const diagnostics = reported.get(file) ?? []
+    assert.deepEqual(diagnostics.map(id).toSorted(), codes.toSorted())
+    assert.deepEqual(
+      diagnostics
+        .filter((diagnostic) => diagnostic.severity !== 'error')
+        .map(id),
+      [],
+    )
   })
 }
 
@@ -182,6 +192,38 @@ test('format sorts builtins, packages, aliases, then relative imports', () => {
 test('format keeps side-effect imports in place', () => {
   const input = "import './reset.css'\nimport './app.css'\n"
   assert.equal(format('entry.ts', input), input)
+})
+
+test('format sorts across a side-effect import unless blank lines separate it', () => {
+  const input = [
+    "import { value } from './z-value'",
+    "import './initialize'",
+    "import { read } from './a-read'",
+    '',
+    'export const all = [value, read]',
+    '',
+  ].join('\n')
+  const output = [
+    "import { read } from './a-read'",
+    "import './initialize'",
+    "import { value } from './z-value'",
+    '',
+    'export const all = [value, read]',
+    '',
+  ].join('\n')
+  assert.equal(format('entry.ts', input), output)
+
+  const separated = [
+    "import { value } from './z-value'",
+    '',
+    "import './initialize'",
+    '',
+    "import { read } from './a-read'",
+    '',
+    'export const all = [value, read]',
+    '',
+  ].join('\n')
+  assert.equal(format('entry.ts', separated), separated)
 })
 
 test('format uses double quotes in CSS', () => {
