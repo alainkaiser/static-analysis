@@ -12,13 +12,15 @@
     "./oxlint": {
       "types": "./oxlint.d.ts",
       "default": "./oxlint.js"
-    }
+    },
+    "./tsconfig": "./tsconfig.json"
   },
   "files": [
     "oxfmt.js",
     "oxfmt.d.ts",
     "oxlint.js",
-    "oxlint.d.ts"
+    "oxlint.d.ts",
+    "tsconfig.json"
   ],
   "scripts": {
     "lint": "oxlint",
