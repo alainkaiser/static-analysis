@@ -28,6 +28,7 @@ const expected = {
   'base/routes/_index.tsx': [],
   'base/routes/blog.$slug.tsx': [],
   'base/shape.ts': [],
+  'base/then-without-return.ts': ['promise(always-return)'],
   'base/ts-ignore.ts': ['typescript(ban-ts-comment)'],
   'base/unused-disable.ts': [unusedDirective],
   'base/value-import-for-type.ts': [
@@ -36,6 +37,29 @@ const expected = {
   ],
   'base/var-and-let.ts': ['eslint(no-var)', 'eslint(prefer-const)'],
   'react/clean.tsx': [],
+  'react/effects/event-handler-prop.tsx': ['react-effects(no-event-handler)'],
+  'react/effects/event-handler-state.tsx': ['react-effects(no-event-handler)'],
+  'react/effects/external-store.tsx': ['react-effects(no-external-store)'],
+  'react/effects/fetch-await-without-cleanup.tsx': [
+    'react-effects(no-fetch-without-cleanup)',
+  ],
+  'react/effects/fetch-then-without-cleanup.tsx': [
+    'react-effects(no-fetch-without-cleanup)',
+  ],
+  'react/effects/notify-parent-hook-data.tsx': [
+    'react-effects(no-notify-parent)',
+  ],
+  'react/effects/notify-parent-state.tsx': ['react-effects(no-notify-parent)'],
+  'react/effects/ok-chat-connection.tsx': [],
+  'react/effects/ok-derived-condition.tsx': [],
+  'react/effects/ok-early-return-cleanup.tsx': [],
+  'react/effects/ok-document-title.tsx': [],
+  'react/effects/ok-fetch-with-cleanup.tsx': [],
+  'react/effects/ok-gated-sync-without-data.tsx': [],
+  'react/effects/ok-listener-notifies-parent.tsx': [],
+  'react/effects/ok-notify-parent-without-state.tsx': [],
+  'react/effects/ok-observer-callbacks.tsx': [],
+  'react/effects/ok-ref-sync.tsx': [],
   'react/conditional-hook.tsx': ['react-hooks(rules-of-hooks)'],
   'react/impure-render.tsx': ['react(purity)'],
   'react/jsx-checks.tsx': [
