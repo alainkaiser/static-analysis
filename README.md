@@ -1,6 +1,6 @@
 # static-analysis
 
-Shared static analysis setup for projects: the automatic checks a project installs as a dev dependency. It ships [Oxlint](https://oxc.rs/docs/guide/usage/linter) and [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) configs.
+Shared static analysis setup for projects: the automatic checks a project installs as a dev dependency. It ships [Oxlint](https://oxc.rs/docs/guide/usage/linter), [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) and TypeScript configs.
 
 ## Use in a project
 
@@ -12,7 +12,17 @@ Shared static analysis setup for projects: the automatic checks a project instal
 
    While this repository is private, the install works only where Git has access to it.
 
-2. Create `oxlint.config.ts`:
+2. Extend the shared TypeScript settings in `tsconfig.json`:
+
+   ```json
+   {
+     "extends": "@alainkaiser/static-analysis/tsconfig"
+   }
+   ```
+
+   Keep the project's own `module`, `jsx`, `lib`, `types` and `paths`. Remove the options that the shared file already sets.
+
+3. Create `oxlint.config.ts`:
 
    ```ts
    import { base, react, typeAware } from '@alainkaiser/static-analysis/oxlint'
@@ -26,7 +36,7 @@ Shared static analysis setup for projects: the automatic checks a project instal
    })
    ```
 
-3. Create `oxfmt.config.ts`:
+4. Create `oxfmt.config.ts`:
 
    ```ts
    import base from '@alainkaiser/static-analysis/oxfmt'
@@ -37,7 +47,7 @@ Shared static analysis setup for projects: the automatic checks a project instal
    })
    ```
 
-4. Set the scripts in `package.json`:
+5. Set the scripts in `package.json`:
 
    ```json
    {
@@ -46,19 +56,47 @@ Shared static analysis setup for projects: the automatic checks a project instal
    }
    ```
 
+   With `typeAware`, `oxlint` also reports TypeScript compiler errors, so the project needs no separate `tsc` step. In React Router projects, run `react-router typegen` before `oxlint`. Without the generated types, each `./+types/*` import fails with TS2307.
+
 ## Lint presets
 
 Every rule reports as an error. A check that passes or fails is something CI and coding agents act on; warnings get ignored.
 
 | Preset      | Use for                         | Contains                                                                                                                                                                                 |
 | ----------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `base`      | Every project                   | Oxlint's `correctness` and `suspicious` categories, no `any`, no non-null assertions, no blanket lint or TypeScript suppressions, no import cycles, kebab-case file names                 |
+| `base`      | Every project                   | Oxlint's `correctness` and `suspicious` categories, no `any`, no non-null assertions, no blanket lint or TypeScript suppressions, no empty blocks such as `catch {}`, no import cycles, kebab-case file names, no focused, skipped or assertion-free Vitest tests |
 | `react`     | React projects                  | The `recommended` preset of `eslint-plugin-react-hooks` from [react.dev](https://react.dev/reference/eslint-plugin-react-hooks), including the React Compiler rules, plus JSX and `jsx-a11y` checks |
-| `typeAware` | TypeScript 7 projects           | The type-checked rules of typescript-eslint: floating and misused promises, the `no-unsafe-*` family, plus unnecessary conditions, deprecated APIs and exhaustive switches               |
+| `typeAware` | TypeScript 7 projects that extend the shared `tsconfig` | TypeScript compiler errors and the type-checked rules of typescript-eslint: floating and misused promises, the `no-unsafe-*` family, plus unnecessary conditions, deprecated APIs, exhaustive switches and a missing `await` on a promise returned inside `try` |
 
-`typeAware` turns on type-aware linting by itself and needs `oxlint-tsgolint` installed. Leave it out of `extends` in projects that cannot use it.
+`typeAware` turns on type-aware linting and type checking by itself. It needs `oxlint-tsgolint` and TypeScript 7. Leave it out of `extends` in projects that cannot use it.
 
 Project rules go into the project's `oxlint.config.ts` after `extends`, for example `no-restricted-imports` with a message that names the replacement.
+
+## TypeScript settings
+
+`tsconfig.json` turns on `strict`, `noUncheckedIndexedAccess`, `noImplicitOverride`, `noFallthroughCasesInSwitch`, `verbatimModuleSyntax`, `moduleDetection: "force"` and `skipLibCheck`.
+
+`typeAware` depends on `noUncheckedIndexedAccess`. Without it, `record[key]` never includes `undefined`, so `typescript/no-unnecessary-condition` reports the `=== undefined` guard after a lookup as unnecessary. Deleting that guard ships a crash on a missing key.
+
+`exactOptionalPropertyTypes` stays off. It rejects passing a `string | undefined` value to an optional `string` prop, which React components do all the time.
+
+## Coding agents
+
+Run the check where the agent finishes its turn, not only in CI. In Claude Code, add a `Stop` hook to the project's `.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [{ "type": "command", "command": "npm run lint 1>&2 || exit 2" }]
+      }
+    ]
+  }
+}
+```
+
+Exit code 2 sends the lint output back to Claude, which keeps working until the check passes. Claude Code ignores the hook after it blocks 8 times in a row with no tool call in between, so a check the agent cannot fix does not loop forever. Keep CI as the final gate.
 
 ## Formatting
 
@@ -111,3 +149,7 @@ export default defineConfig({
    - Tailwind class sorting, once enabled, uses the official Tailwind order and reorders most class strings once.
 4. Run `npx oxlint` and fix or triage the findings.
 5. Remove `@biomejs/biome` and `biome.json`.
+
+## Change this package
+
+`npm test` lints the files in `test/fixtures` with all three presets. For each file, it compares the reported rule IDs with the table in `test/presets.test.js`, and it checks three formatting cases. When you change a preset or upgrade Oxlint, add or update a fixture and its expected IDs, then run `npm run check`.
