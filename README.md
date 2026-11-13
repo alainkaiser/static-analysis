@@ -1,6 +1,6 @@
 # static-analysis
 
-Shared static analysis setup for projects: the automatic checks a project installs as a dev dependency. It ships [Oxlint](https://oxc.rs/docs/guide/usage/linter), [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) and TypeScript configs.
+Shared static analysis setup for projects: the automatic checks a project installs as a dev dependency. It ships [Oxlint](https://oxc.rs/docs/guide/usage/linter), [Oxfmt](https://oxc.rs/docs/guide/usage/formatter), TypeScript and [React Doctor](#react-doctor) configs.
 
 ## Use in a project
 
@@ -92,6 +92,61 @@ The `react` preset loads `plugins/react-effects.js`, an Oxlint JS plugin in this
 `react/set-state-in-effect` already reports derived state, state that is reset or adjusted when a prop changes, and chains of effects. Effects that run once at app start stay unreported, because whether that code belongs in an effect depends on intent.
 
 The rules skip calls on refs such as `ref.current?.showModal()`, calls that do not receive the tested value, and calls inside listeners and observers. Oxlint marks JS plugins as alpha, so an Oxlint upgrade can break the plugin. `npm test` catches that.
+
+## React Doctor
+
+[React Doctor](https://react.doctor) is an optional second check for React projects. Its CLI runs its own Oxlint with a generated config and does not read `oxlint.config.ts`, so it does not change what `oxlint` reports. On its own, it reports many problems that the `react` preset already reports. The shared config turns those rules off.
+
+1. Install it:
+
+   ```bash
+   npm i -D react-doctor
+   ```
+
+   With `typeAware`, `oxlint` type-checks `doctor.config.ts`. Without the installed package, the `react-doctor/api` import fails with TS2307.
+
+2. Create `doctor.config.ts`:
+
+   ```ts
+   import base from '@alainkaiser/static-analysis/doctor'
+   import { defineConfig } from 'react-doctor/api'
+
+   export default defineConfig({
+     ...base,
+   })
+   ```
+
+3. Run `npx react-doctor`.
+
+| Shared setting | Turns off | Reported by |
+| --- | --- | --- |
+| `customRulesOnly: true` | React Doctor's copies of rules from other lint plugins, such as `react`, `jsx-a11y` and React hooks, and its React Compiler plugin | the `react` preset |
+| `react-doctor/no-effect-event-handler`, `react-doctor/no-event-trigger-state` | effects used as event handlers | `react-effects/no-event-handler` |
+| `react-doctor/no-prop-callback-in-effect` | effects that keep a parent in sync through a callback prop | `react-effects/no-notify-parent` |
+| `react-doctor/no-fetch-in-effect`, `react-doctor/no-set-state-after-await-in-effect` | fetches and asynchronous state updates in an effect without cancellation | `react-effects/no-fetch-without-cleanup` |
+| `react-doctor/no-derived-state-effect`, `react-doctor/no-effect-chain`, `react-doctor/no-mirror-prop-effect` | derived state, chains of effects and props copied into state | `react/set-state-in-effect` |
+| `react-doctor/no-array-index-as-key` | array indexes used as keys | `react/no-array-index-key` |
+| `react-doctor/no-nested-component-definition` | components defined inside components | `react/no-unstable-nested-components` |
+
+A copied rule that the `react` preset does not enable is then off in both tools. To use it, enable the original rule in `oxlint.config.ts`.
+
+Two overlapping rules stay on:
+
+- `react-doctor/prefer-use-sync-external-store` reports state that starts from an external value and changes only in a listener. `react-effects/no-external-store` reports effects that also copy the value right away.
+- `react-doctor/dangerous-html-sink` also reports `innerHTML` assignments. A `dangerouslySetInnerHTML` prop is reported by it and by `react/no-danger`.
+
+The list matches React Doctor 0.9.22. After a React Doctor upgrade, copy `test/fixtures/react` into a scratch project and run both tools on it. A line that both report is a new duplicate.
+
+To change a rule in one project, keep the shared ones:
+
+```ts
+export default defineConfig({
+  ...base,
+  rules: { ...base.rules, 'react-doctor/no-danger': 'off' },
+})
+```
+
+To suppress one React Doctor finding, use `// react-doctor-disable-next-line <rule>`. An `oxlint-disable` comment that names a React Doctor rule fails `oxlint` as an unused directive.
 
 ## TypeScript settings
 
