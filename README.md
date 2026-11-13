@@ -12,6 +12,8 @@ Shared static analysis setup for projects: the automatic checks a project instal
 
    While this repository is private, the install works only where Git has access to it.
 
+   Oxlint does not skip `node_modules` on its own. Check that the project's `.gitignore` lists `node_modules`. Without that entry, `oxlint` also lints the installed packages.
+
 2. Extend the shared TypeScript settings in `tsconfig.json`:
 
    ```json
