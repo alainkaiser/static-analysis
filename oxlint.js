@@ -21,12 +21,15 @@ export const base = {
     eqeqeq: ['error', 'always', { null: 'ignore' }],
     'promise/always-return': ['error', { ignoreLastCallback: true }],
     'no-empty': 'error',
+    'no-promise-executor-return': 'error',
+    'no-prototype-builtins': 'error',
     'no-var': 'error',
     'prefer-const': 'error',
     'import/no-cycle': 'error',
     'typescript/ban-ts-comment': 'error',
     'typescript/consistent-type-imports': 'error',
     'typescript/no-explicit-any': 'error',
+    'typescript/no-import-type-side-effects': 'error',
     'typescript/no-non-null-assertion': 'error',
     'unicorn/filename-case': ['error', { case: 'kebabCase' }],
     'unicorn/no-abusive-eslint-disable': 'error',
@@ -122,6 +125,7 @@ export const typeAware = {
     'typescript/return-await': ['error', 'error-handling-correctness-only'],
     'typescript/switch-exhaustiveness-check': 'error',
     'typescript/unbound-method': 'error',
+    'typescript/use-unknown-in-catch-callback-variable': 'error',
 
     // The type check already reports a missing return value where the result
     // is used. This rule also reports effects that return early and return a

@@ -37,6 +37,7 @@ Requirements: Node 22.18, Oxlint 1.91 and Oxfmt 0.76, or newer. `typeAware` also
 
    export default defineConfig({
      extends: [base, react, typeAware],
+     ignorePatterns: ['**/node_modules/**'],
      options: {
        reportUnusedDisableDirectives: 'error',
      },
@@ -68,7 +69,7 @@ Four things to know:
 - **Type errors.** With `typeAware`, `oxlint` reports TypeScript compiler errors, so `lint` needs no `tsc`. One exception: `oxlint` skips files that `.gitignore` or `ignorePatterns` exclude. If `tsconfig.json` includes such files, keep `tsc` in `lint`.
 - **React Router.** Its `tsconfig.json` includes the git-ignored `.react-router/types`. Use `"lint": "react-router typegen && tsc && oxlint && oxfmt --check"`. Without the generated types, each `./+types/*` import fails with TS2307.
 - **Import order.** `oxfmt` sorts imports across a side-effect import such as `import './setup'`. To keep a module first, put a blank line before and after its import.
-- **`node_modules`.** Oxlint lints the installed packages unless `.gitignore` lists `node_modules`.
+- **`node_modules`.** Keep the dependency ignore in the project's root Oxlint config when adding other patterns. Oxlint 1.91 skips installed dependencies with that root setting even in a project without a `.gitignore`.
 
 ## Lint presets
 
@@ -83,6 +84,15 @@ Every rule reports as an error. CI and coding agents act on pass or fail, and wa
 - `typeAware` turns on type checking by itself. Leave it out of `extends` in projects that cannot use it.
 - `base` does not check the conditions of `skipIf` and `runIf`: `it.skipIf(true)` passes lint.
 - Project rules go after `extends` in the project's `oxlint.config.ts`.
+
+These four checks also run in Cloudflare's shared configuration. [Cloudflare Oxlint config v0.1.0](https://github.com/cloudflare/oxlint-config/tree/v0.1.0)
+
+| Preset | What the check catches | What passes |
+| --- | --- | --- |
+| `base` | A Promise executor returns a cached value and leaves the promise pending | Call `resolve(cached)` and return before the fallback. Use a block body when an executor starts a timer. |
+| `base` | A dictionary calls `fields.hasOwnProperty(key)` directly, which can throw when the method is absent or shadowed | Use `Object.hasOwn(fields, key)`. |
+| `base` | `import { type Entry }` can still run the imported module under `verbatimModuleSyntax` | Use `import type { Entry }`. A value and a type can share one import. |
+| `typeAware` | A Promise rejection callback assumes the reason is an `Error` | Accept `reason: unknown` and narrow it, or omit an unused parameter. |
 
 ## React effect rules
 
